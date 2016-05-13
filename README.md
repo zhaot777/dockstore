@@ -36,6 +36,10 @@ If you have access to our confidential data package for extended testing, you ca
 
 As a pre-requisite, you will need to have postgres installed and setup with the database user specified in .travis.yml. 
 
+To skip tests:
+
+    mvn clean install -DskipTests
+
 ### Running Locally
 
 You can also run it on your local computer but will need to setup postgres separately.
