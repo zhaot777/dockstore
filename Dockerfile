@@ -28,3 +28,4 @@ EXPOSE 8080
 
 # default command launches daemons
 CMD /docker-dockstore-entrypoint.sh
+
