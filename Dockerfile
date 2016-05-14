@@ -17,12 +17,20 @@ ENV JAVA_HOME /usr/lib/jvm/java-8-oracle
 
 # install deps
 RUN echo "deb http://http.debian.net/debian jessie-backports main" >> /etc/apt/sources.list
-RUN apt-get update && apt-get install -y maven
+RUN apt-get update && apt-get install -y maven python-setuptools python-dev build-essential
+RUN easy_install pip
+RUN easy_install -U setuptools
 
 # build app
 COPY dockstore.yml /dockstore.yml
 COPY docker-dockstore-entrypoint.sh /docker-dockstore-entrypoint.sh
-RUN wget https://seqwaremaven.oicr.on.ca/artifactory/collab-release/io/dockstore/dockstore-webservice/0.2.1/dockstore-webservice-0.2.1.jar
+COPY . /root/
+WORKDIR /root
+RUN pip install cwl-runner  cwltool==1.0.20160316150250 schema-salad==1.7.20160316150109 avro==1.7.7
+# have to build with skip tests since some tests call out to docker which is difficult within docker
+RUN mvn clean install -DskipTests
+RUN cp dockstore-webservice/target/dockstore-webservice-*.jar /
+#RUN wget https://seqwaremaven.oicr.on.ca/artifactory/collab-release/io/dockstore/dockstore-webservice/0.2.1/dockstore-webservice-0.2.1.jar
 RUN chmod a+x /docker-dockstore-entrypoint.sh
 EXPOSE 8080
 
