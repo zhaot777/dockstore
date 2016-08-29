@@ -41,6 +41,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 import java.io.UnsupportedEncodingException;
@@ -112,7 +113,11 @@ public class ToolsApiServiceImpl extends ToolsApiService {
                 ToolClassesApiServiceImpl.getWorkflowClass();
 
         io.swagger.model.Tool tool = new io.swagger.model.Tool();
-        tool.setAuthor(container.getAuthor());
+        if (container.getAuthor() == null){
+            tool.setAuthor("Unknown author");
+        } else{
+            tool.setAuthor(container.getAuthor());
+        }
         tool.setDescription(container.getDescription());
         tool.setMetaVersion(container.getLastUpdated() != null ? container.getLastUpdated().toString() : null);
         tool.setToolclass(type);
@@ -217,8 +222,11 @@ public class ToolsApiServiceImpl extends ToolsApiService {
             if (container instanceof Tool) {
                 version.setImage(((Tool) container).getPath() + ":" + inputVersion.getName());
             }
-            tool.getVersions().add(version);
-            version.setMetaVersion(inputVersion.getLastModified() != null ? String.valueOf(inputVersion.getLastModified()) : null);
+            if (version.getDescriptor() != null) {
+                // ensure that descriptor is non-null before adding to list
+                tool.getVersions().add(version);
+                version.setMetaVersion(inputVersion.getLastModified() != null ? String.valueOf(inputVersion.getLastModified()) : null);
+            }
         }
         return tool;
     }
@@ -417,7 +425,9 @@ public class ToolsApiServiceImpl extends ToolsApiService {
             }
             // if passing, for each container that matches the criteria, convert to standardised format and return
             io.swagger.model.Tool tool = convertContainer2Tool(c);
-            results.add(tool);
+            if (tool != null) {
+                results.add(tool);
+            }
         }
 
         if (limit == null){
@@ -520,7 +530,7 @@ public class ToolsApiServiceImpl extends ToolsApiService {
             final ToolVersion toolVersion = first.get();
             if (type == SourceFile.FileType.DOCKERFILE) {
                 final ToolDockerfile dockerfile = toolVersion.getDockerfile();
-                return Response.status(Response.Status.OK).entity(unwrap ? dockerfile.getDockerfile() : dockerfile).build();
+                return Response.status(Response.Status.OK).type(unwrap? MediaType.TEXT_PLAIN : MediaType.APPLICATION_JSON).entity(unwrap ? dockerfile.getDockerfile() : dockerfile).build();
             } else {
                 if (relativePath == null) {
                     if (type == SourceFile.FileType.DOCKSTORE_WDL && toolVersion.getDescriptor().getType() == ToolDescriptor.TypeEnum.WDL) {
@@ -529,7 +539,7 @@ public class ToolsApiServiceImpl extends ToolsApiService {
                     } else if (type == SourceFile.FileType.DOCKSTORE_CWL
                             && toolVersion.getDescriptor().getType() == ToolDescriptor.TypeEnum.CWL) {
                         final ToolDescriptor descriptor = toolVersion.getDescriptor();
-                        return Response.status(Response.Status.OK).entity(unwrap ? descriptor.getDescriptor() : descriptor).build();
+                        return Response.status(Response.Status.OK).type(unwrap? MediaType.TEXT_PLAIN : MediaType.APPLICATION_JSON).entity(unwrap ? descriptor.getDescriptor() : descriptor).build();
                     }
                     return Response.status(Response.Status.NOT_FOUND).build();
                 } else {
@@ -538,7 +548,7 @@ public class ToolsApiServiceImpl extends ToolsApiService {
                             .findFirst();
                     if (first1.isPresent()) {
                         final SourceFile entity = first1.get();
-                        return Response.status(Response.Status.OK).entity(unwrap ? entity.getContent() : entity).build();
+                        return Response.status(Response.Status.OK).type(unwrap? MediaType.TEXT_PLAIN : MediaType.APPLICATION_JSON).entity(unwrap ? entity.getContent() : entity).build();
                     }
                 }
             }
