@@ -37,7 +37,7 @@ import java.util.Objects;
 @ApiModel("SourceFile")
 @Entity
 @Table(name = "sourcefile")
-public class SourceFile {
+public class SourceFile implements Comparable<SourceFile> {
     public enum FileType {
         // Add supported descriptor types here
         DOCKSTORE_CWL, DOCKSTORE_WDL, DOCKERFILE
@@ -94,6 +94,11 @@ public class SourceFile {
 
     public void setPath(String path) {
         this.path = path;
+    }
+
+    @Override
+    public int compareTo(SourceFile o) {
+        return Long.compare(getId(), o.getId());
     }
 
     @Override

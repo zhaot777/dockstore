@@ -16,10 +16,11 @@
 
 package io.dockstore.webservice.core;
 
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.common.collect.ComparisonChain;
+import com.google.common.collect.Ordering;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -33,14 +34,13 @@ import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
 import javax.persistence.SequenceGenerator;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.common.collect.ComparisonChain;
-import com.google.common.collect.Ordering;
-
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import java.util.Date;
+import java.util.Objects;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 /**
  * This describes one version of either a workflow or a tool.
@@ -71,10 +71,11 @@ public abstract class Version<T extends Version> implements Comparable<T>{
     @OneToMany(fetch = FetchType.EAGER, orphanRemoval = true, cascade = CascadeType.ALL)
     @JoinTable(name = "version_sourcefile", joinColumns = @JoinColumn(name = "versionid", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "sourcefileid", referencedColumnName = "id"))
     @ApiModelProperty("Cached files for each version. Includes Dockerfile and Descriptor files")
-    private final Set<SourceFile> sourceFiles;
+    @OrderBy("id")
+    private final SortedSet<SourceFile> sourceFiles;
 
     public Version() {
-        sourceFiles = new HashSet<>(0);
+        sourceFiles = new TreeSet<>();
     }
 
     @Column
