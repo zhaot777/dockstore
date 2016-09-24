@@ -1,17 +1,17 @@
 template: Hello, %s!
-quayClientID: <fill me in>
+quayClientID: 1KPJGHD0555PSR9L3OZV
 # port should match the port where the UI is being hosted, 9000 by default
-quayRedirectURI: http://<fill me in>:9000/accounts
-githubClientID: <fill me in>
-githubClientSecret: <fill me in>
+quayRedirectURI: http://localhost:9000/auth/quay.io
+githubClientID: 2e427151f8a0b3ff2b62
+githubClientSecret: 0dc98d0fac46b380be2a5dbbb381cc964862346d
 # port should match the port where the UI is being hosted, 9000 by default
-githubRedirectURI: http://<fill me in>:9000/login
+githubRedirectURI: http://localhost:9000/login
 bitbucketClientID: <fill me in>
 bitbucketClientSecret:  <fill me in>
 # the following values describe where the webservice is being run (and on what port and using what scheme) to configure swagger
-hostname: <fill me in>
-scheme: https
-port: 8443
+hostname: localhost
+scheme: http
+port: 8080
 
 authenticationCachePolicy: maximumSize=10000, expireAfterAccess=10m
 
